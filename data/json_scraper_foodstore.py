@@ -28,18 +28,17 @@ while True:
         break
     last_height = new_height
 
-# Find all product cards
 products = driver.find_elements(By.CSS_SELECTOR, "xo-product-card")
 
 data = []
 
-# helper to remove euro sign and trim whitespace
 def clean_price(value):
     if value is None:
         return None
     return value.replace('€', '').strip()
 
 for p in products:
+
     try:
         name = p.find_element(By.CSS_SELECTOR, "h3").text.strip()
     except:
@@ -53,6 +52,11 @@ for p in products:
     price = clean_price(price)
 
     try:
+        unit = p.find_element(By.CSS_SELECTOR, ".xo-product-card__general-unit").text.strip()
+    except:
+        unit = None
+
+    try:
         link = p.find_element(By.CSS_SELECTOR, "a.xo-product-card__heading").get_attribute("href")
     except:
         link = None
@@ -62,7 +66,6 @@ for p in products:
     except:
         img = None
 
-    # attributes stored directly on the tag
     product_id = p.get_attribute("xo-product-id")
     handle = p.get_attribute("xo-product-handle")
     vendor = p.get_attribute("xo-product-vendor")
@@ -70,6 +73,7 @@ for p in products:
     data.append({
         "name": name,
         "price": price,
+        "unit": unit,
         "link": link,
         "image_url": img,
         "vendor": vendor,
@@ -79,7 +83,6 @@ for p in products:
 
 driver.quit()
 
-# Save CSV
 keys = data[0].keys()
 
 with open("upfront_products.csv", "w", newline="", encoding="utf-8") as f:

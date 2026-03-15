@@ -34,6 +34,12 @@ products = driver.find_elements(By.CSS_SELECTOR, "xo-product-card")
 
 data = []
 
+# helper to remove euro sign and trim whitespace
+def clean_price(value):
+    if value is None:
+        return None
+    return value.replace('€', '').strip()
+
 for p in products:
 
     product_id = p.get_attribute("xo-product-id")
@@ -51,6 +57,8 @@ for p in products:
         price = p.find_element(By.CSS_SELECTOR, ".xo-price__item").text.strip()
     except:
         price = raw_price
+
+    price = clean_price(price)
 
     try:
         link = p.find_element(By.CSS_SELECTOR, "a.xo-product-card__heading").get_attribute("href")
@@ -82,7 +90,7 @@ driver.quit()
 
 # Save to CSV
 with open("upfront_online_store_products.csv", "w", newline="", encoding="utf-8") as f:
-    writer = csv.DictWriter(f, fieldnames=data[0].keys())
+    writer = csv.DictWriter(f, fieldnames=data[0].keys(), delimiter=';')
     writer.writeheader()
     writer.writerows(data)
 
